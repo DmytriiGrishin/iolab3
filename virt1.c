@@ -24,11 +24,10 @@ struct priv {
 static rx_handler_result_t handle_frame( struct sk_buff **pskb ) {
    struct sk_buff *skb = *pskb;
    if (skb->protocol == htons(ETH_P_ARP)) {
-      LOG("AND PROTOCOL IS: %d\n", skb->protocol);
       struct arphdr* arph = arp_hdr(skb);
       if (arph->ar_op == htons(ARPOP_REPLY)) {
          unsigned char* arpptr = skb_network_header(*pskb) + sizeof(*arph);
-         LOG("ARP reply sender MAC: %2x:%2x:%2x:%2x:%2x:%2x\n", arpptr[5], arpptr[4], arpptr[3], arpptr[2], arpptr[1], arpptr[0]);
+         LOG("ARP reply sender MAC: %2x:%2x:%2x:%2x:%2x:%2x\n", arpptr[0], arpptr[1], arpptr[2], arpptr[3], arpptr[4], arpptr[5]);
          LOG("ARP reply sender IP: %d.%d.%d.%d\n", arpptr[6], arpptr[7], arpptr[8], arpptr[9]);
          arpptr += 10;
          LOG("ARP reply needed MAC: %2x:%2x:%2x:%2x:%2x:%2x\n", arpptr[0], arpptr[1], arpptr[2], arpptr[3], arpptr[4], arpptr[5]);
@@ -36,7 +35,7 @@ static rx_handler_result_t handle_frame( struct sk_buff **pskb ) {
       }
       if (arph->ar_op == htons(ARPOP_REQUEST)) {
          unsigned char* arpptr = skb_network_header(*pskb) + sizeof(*arph);
-         LOG("ARP request sender MAC: %2x:%2x:%2x:%2x:%2x:%2x\n", arpptr[5], arpptr[4], arpptr[3], arpptr[2], arpptr[1], arpptr[0]);
+         LOG("ARP request sender MAC: %2x:%2x:%2x:%2x:%2x:%2x\n", arpptr[0], arpptr[1], arpptr[2], arpptr[3], arpptr[4], arpptr[5]);
          LOG("ARP request sender IP: %d.%d.%d.%d\n", arpptr[6], arpptr[7], arpptr[8], arpptr[9]);
          arpptr += 10;
          LOG("ARP request needed MAC: %2x:%2x:%2x:%2x:%2x:%2x\n", arpptr[0], arpptr[1], arpptr[2], arpptr[3], arpptr[4], arpptr[5]);
@@ -68,7 +67,6 @@ static netdev_tx_t start_xmit( struct sk_buff *skb, struct net_device *dev ) {
       skb->dev = priv->parent;
       skb->priority = 1;
       dev_queue_xmit( skb );
-      // LOG( "tx: injecting frame from %s to %s", dev->name, skb->dev->name );
       return 0;
    }
    return NETDEV_TX_OK;

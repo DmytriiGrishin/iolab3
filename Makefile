@@ -17,8 +17,7 @@ do:
 od:
 	sudo rmmod $(MODULE)
 if:
-	ifconfig $(VIRTDEV) 
-	ip -c a show dev $(VIRTDEV)
+	ip -s a show dev $(VIRTDEV)
 	cat /proc/net/dev | grep -e $(VIRTDEV) -e $(DEVICE)
 
 redo:
